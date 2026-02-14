@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crab & Baymax ❤</title>
+    <!-- 引入手写花体字 -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #02020a;
+            --star-glow: rgba(255, 255, 255, 0.8);
+            --neon-green: #39FF14;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        #universe {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at center, #1b2735 0%, #050510 70%, #000 100%);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 银河核心光晕 */
+        #universe::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(100, 150, 255, 0.05) 0%, transparent 70%);
+            filter: blur(50px);
+            z-index: 0;
+        }
+
+        /* 阶梯文字容器 - 置于绝对底层 */
+        .greeting-container {
+            position: absolute;
+            width: 80vw;
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 0;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .greeting-word {
+            font-family: 'Dancing Script', cursive;
+            font-size: 5.5rem;
+            color: var(--neon-green);
+            opacity: 0.45;
+            text-shadow: 
+                0 0 8px rgba(57, 255, 20, 0.3),
+                0 0 15px rgba(57, 255, 20, 0.1);
+            animation: pulse 5s infinite ease-in-out;
+            line-height: 1;
+        }
+
+        .word-1 { align-self: flex-start; }
+        .word-2 { align-self: center; }
+        .word-3 { align-self: flex-end; }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.35; }
+            50% { transform: scale(1.02); opacity: 0.55; }
+        }
+
+        .signature {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.2rem;
+            color: white;
+            opacity: 0.8;
+            z-index: 2; 
+            pointer-events: none;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+        }
+
+        .day-counter {
+            position: absolute;
+            bottom: 40px;
+            right: 50px;
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.8rem;
+            color: white;
+            opacity: 0.7;
+            z-index: 2;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+        }
+
+        .orbit-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform-origin: center;
+            border-radius: 50%;
+            animation: galaxy-rotate linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes galaxy-rotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        @keyframes reverse-rotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(-360deg); }
+        }
+
+        .bg-star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .star-wrapper {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 10;
+            animation: reverse-rotate linear infinite;
+            animation-duration: inherit;
+        }
+
+        .shape-container {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            filter: drop-shadow(0 0 5px var(--star-glow));
+            transition: transform 0.4s ease;
+            opacity: 0.6;
+        }
+
+        .star-wrapper:hover .shape-container {
+            transform: scale(1.6) rotate(0deg) !important;
+            filter: drop-shadow(0 0 15px white);
+            opacity: 1;
+        }
+
+        .orbit-container:has(.star-wrapper:hover) {
+            animation-play-state: paused !important;
+            z-index: 100;
+        }
+        .orbit-container:has(.star-wrapper:hover) .star-wrapper {
+            animation-play-state: paused !important;
+        }
+
+        .preview-card {
+            position: absolute;
+            width: 0;
+            height: auto;
+            opacity: 0;
+            border: 3px solid white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.9);
+            transition: width 0.5s, opacity 0.5s, transform 0.5s;
+            pointer-events: none;
+            background: #111;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transform-origin: center center;
+        }
+
+        .preview-card img {
+            width: 100%;
+            height: auto;
+            max-height: 450px;
+            display: block;
+            background: #000;
+        }
+
+        .card-text {
+            padding: 12px;
+            color: white;
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.2rem;
+            text-align: center;
+            background: rgba(20, 20, 20, 0.9);
+            word-break: break-word;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .star-wrapper:hover .preview-card {
+            width: 280px;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .twinkle { animation: twinkle-glow 3s infinite alternate; }
+        @keyframes twinkle-glow {
+            0% { opacity: 0.2; }
+            100% { opacity: 0.6; }
+        }
+
+        @media (max-width: 768px) {
+            .greeting-word { font-size: 3rem; }
+            .greeting-container { width: 90vw; height: 60vh; }
+            .star-wrapper:hover .preview-card { width: 220px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="universe">
+        <div class="greeting-container">
+            <div class="greeting-word word-1">Happy</div>
+            <div class="greeting-word word-2">Valentine's</div>
+            <div class="greeting-word word-3">Day!</div>
+        </div>
+
+        <div class="signature">Crab & Baymax</div>
+        <div id="day-counter" class="day-counter"></div>
+    </div>
+
+    <script>
+        const universe = document.getElementById('universe');
+        const bgStarCount = 300;
+
+        const imageUrls = [
+            'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/rQ7e/1706X1279/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260214141319_282_173.jpg/webp',
+            'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/laTb/1706X1279/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260214141607_283_173.jpg/webp',
+            'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/ef79/1278X1704/983185a8d698b52cf8361a5e874975bd.jpg/webp',
+            'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/MTKM/1280X960/2024-12-31.jpg/webp',
+            'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/kJS0/1706X1279/2025-1-1.jpg/webp',
+            'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/TstW/1280X960/2025-2-10.jpg/webp',
+            'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/7rSe/1444X960/2025-2-14.jpg/webp',
+            'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/DUHn/1279X1705/2025-3-2.jpg/webp',
+            'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/xYAp/1706X1279/2025-3-8.jpg/webp',
+            'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/V81n/1706X1279/0329.jpg/webp',
+            'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/Uy0o/1120X842/0412.jpg/webp',
+            'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/dLLO/384X288/0501.jpg/webp',
+            'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/Uo71/960X1282/0722.jpg/webp',
+            'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/D3oX/1706X1279/0914.jpg/webp',
+            'https://pic8.fukit.cn/autoupload/ndnhpIjVhumHJooeV3L049iO_OyvX7mIgxFBfDMDErs/20260214/yQt3/1279X1706/1018.jpg/webp',
+            'https://pic8.fukit.cn/autoupload/ndnhpIjVhumHJooeV3L049iO_OyvX7mIgxFBfDMDErs/20260214/23Aa/1706X1279/1127.jpg/webp',
+            'https://pic8.fukit.cn/autoupload/ndnhpIjVhumHJooeV3L049iO_OyvX7mIgxFBfDMDErs/20260214/y57e/960X1282/1209.jpg/webp',
+            'https://pic8.fukit.cn/autoupload/ndnhpIjVhumHJooeV3L049iO_OyvX7mIgxFBfDMDErs/20260214/t0b5/1706X1279/1223.jpg/webp',
+            'https://pic8.fukit.cn/autoupload/ndnhpIjVhumHJooeV3L049iO_OyvX7mIgxFBfDMDErs/20260214/hvp6/1279X1706/1224.jpg/webp',
+            'https://pic8.fukit.cn/autoupload/ndnhpIjVhumHJooeV3L049iO_OyvX7mIgxFBfDMDErs/20260214/FAN9/1706X1279/1228.jpg/webp',
+            'https://pic8.fukit.cn/autoupload/ndnhpIjVhumHJooeV3L049iO_OyvX7mIgxFBfDMDErs/20260214/rZ4t/1706X1279/260101.jpg/webp',
+            'https://pic8.fukit.cn/autoupload/ndnhpIjVhumHJooeV3L049iO_OyvX7mIgxFBfDMDErs/20260214/kAre/1920X1280/260127.jpg/webp',
+            'https://pic8.fukit.cn/autoupload/ndnhpIjVhumHJooeV3L049iO_OyvX7mIgxFBfDMDErs/20260214/h5Tm/1920X1280/260213.png/webp'
+        ];
+
+        const imageTexts = [
+            "2024年10月22日，我们留下第一张合照",
+            "2024年11月10日，我们第一次二人同行苏州河",
+            "2024年12月14日，我们走过武康路",
+            "2024年12月31日，我们跨过2024年",
+            "2025年1月1日，我们一起跑了一场小马拉松",
+            "2025年2月10日，我们在东升里，充满爱意",
+            "2025年2月14日，去年的情人节",
+            "2025年3月2日，你的生日！",
+            "2025年3月8日，我们在静安雕塑公园赏樱",
+            "2025年3月29日，我们在共青森林公园",
+            "2025年4月12日，我愿变成童话里 你爱的那个天使~",
+            "2025年5月1日，我们去拍了大头贴！好玩诶！",
+            "2025年7月22日，我们去坐了苏州之眼",
+            "2025年9月14日，我们在滴水湖共度",
+            "2025年10月18日，我们在佘山庆祝一周年纪念日",
+            "2025年11月27日，我们在复旦看银杏",
+            "2025年12月9日，我们一起去吃深夜食堂",
+            "2025年12月23日，我们一起去做饼干",
+            "2025年12月24日，在徐汇滨江，圣诞快乐！",
+            "2025年12月28日，我们一起听新春音乐会",
+            "2026年1月1日，共度的第二个新年快乐！",
+            "2026年1月27日，我们一起环古城，赏梅",
+            "2026年2月13日，听螃蟹的线上演奏会！安可！"
+        ];
+
+        const specialStarCount = imageUrls.length;
+
+        const shapes = {
+            star: "M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z",
+            heart: "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+        };
+
+        function updateDaysCounter() {
+            const startDate = new Date('2024-10-20');
+            const currentDate = new Date();
+            const diffDays = Math.floor(Math.abs(currentDate - startDate) / (1000 * 60 * 60 * 24));
+            document.getElementById('day-counter').innerText = `-- ${diffDays} Days`;
+        }
+
+        function createOrbit(duration, reverse = false) {
+            const orbit = document.createElement('div');
+            orbit.className = 'orbit-container';
+            orbit.style.animationDuration = `${duration}s`;
+            if(reverse) orbit.style.animationDirection = 'reverse';
+            universe.appendChild(orbit);
+            return orbit;
+        }
+
+        function placeInGalaxy(element, radius, angle) {
+            element.style.left = `calc(50% + ${radius * Math.cos(angle)}px)`;
+            element.style.top = `calc(50% + ${radius * Math.sin(angle)}px)`;
+            element.style.transform = `translate(-50%, -50%)`;
+        }
+
+        function initGalaxy() {
+            const vw = window.innerWidth;
+            const vh = window.innerHeight;
+            const minDim = Math.min(vw, vh);
+            const maxSafeRadius = minDim * 0.42; 
+
+            const orbitLayers = [createOrbit(60), createOrbit(90), createOrbit(120)];
+
+            // 背景星随机分布，允许溢出屏幕 (Background stars distributed randomly, allowing overflow)
+            for (let i = 0; i < bgStarCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'bg-star twinkle';
+                const size = (Math.random() * 2 + 0.5) * 2;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                // 允许半径远超屏幕边缘 (Allow radius to far exceed screen edges)
+                const radius = Math.random() * Math.max(vw, vh) * 1.5; 
+                const angle = Math.random() * Math.PI * 2;
+                placeInGalaxy(star, radius, angle);
+                orbitLayers[Math.floor(Math.random() * orbitLayers.length)].appendChild(star);
+            }
+
+            const specialOrbitDuration = 150;
+            const specialOrbit = createOrbit(specialOrbitDuration);
+            
+            for (let i = 0; i < specialStarCount; i++) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'star-wrapper';
+                
+                const innerLimit = minDim * 0.15;
+                const outerLimit = maxSafeRadius;
+                const radius = innerLimit + (i / specialStarCount) * (outerLimit - innerLimit);
+                
+                const angle = i * 2.4; 
+                placeInGalaxy(wrapper, radius, angle);
+
+                const randomRotation = Math.random() * 360;
+                const shapeContainer = document.createElement('div');
+                shapeContainer.className = 'shape-container twinkle';
+                shapeContainer.style.transform = `rotate(${randomRotation}deg)`;
+                
+                const isHeart = Math.random() > 0.5;
+                const color = isHeart ? '#ff4d4d' : '#ffe066';
+                shapeContainer.innerHTML = `<svg viewBox="0 0 24 24"><path d="${shapes[isHeart ? 'heart' : 'star']}" fill="${color}"></path></svg>`;
+
+                const card = document.createElement('div');
+                card.className = 'preview-card';
+                
+                const img = document.createElement('img');
+                img.src = imageUrls[i];
+                
+                const textDiv = document.createElement('div');
+                textDiv.className = 'card-text';
+                textDiv.innerText = imageTexts[i];
+                
+                card.appendChild(img);
+                card.appendChild(textDiv);
+                
+                wrapper.appendChild(shapeContainer);
+                wrapper.appendChild(card);
+                specialOrbit.appendChild(wrapper);
+
+                wrapper.addEventListener('mouseenter', () => {
+                    const rect = wrapper.getBoundingClientRect();
+                    const cardInner = wrapper.querySelector('.preview-card');
+                    
+                    let translateX = -50;
+                    let translateY = -50;
+
+                    if (rect.top < 220) translateY = -20;
+                    if (vh - rect.bottom < 220) translateY = -80;
+                    if (rect.left < 150) translateX = -20;
+                    if (vw - rect.right < 150) translateX = -80;
+
+                    cardInner.style.transform = `translate(${translateX}%, ${translateY}%) scale(1)`;
+                });
+                
+                wrapper.addEventListener('mouseleave', () => {
+                    const cardInner = wrapper.querySelector('.preview-card');
+                    cardInner.style.transform = `translate(-50%, -50%) scale(0)`;
+                });
+            }
+        }
+
+        window.addEventListener('load', () => {
+            updateDaysCounter();
+            initGalaxy();
+        });
+    </script>
+</body>
+</html>
