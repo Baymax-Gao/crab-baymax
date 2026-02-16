@@ -21,7 +21,7 @@
             overflow: hidden;
             background-color: var(--bg-color);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            touch-action: manipulation; /* 优化移动端点击延迟 */
+            touch-action: manipulation; /* 防止缩放干扰点击 */
         }
 
         #universe {
@@ -35,6 +35,7 @@
             align-items: center;
         }
 
+        /* 银河核心光晕 */
         #universe::before {
             content: '';
             position: absolute;
@@ -45,11 +46,11 @@
             z-index: 0;
         }
 
-        /* 阶梯文字容器 */
+        /* 阶梯文字容器 - 适配移动端布局 */
         .greeting-container {
             position: absolute;
-            width: 80vw;
-            height: 70vh;
+            width: 85vw;
+            height: 65vh;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -60,10 +61,12 @@
 
         .greeting-word {
             font-family: 'Dancing Script', cursive;
-            font-size: clamp(2.5rem, 10vw, 5.5rem);
+            font-size: clamp(2rem, 10vw, 5.5rem); /* 响应式字体大小 */
             color: var(--neon-green);
             opacity: 0.45;
-            text-shadow: 0 0 8px rgba(57, 255, 20, 0.3), 0 0 15px rgba(57, 255, 20, 0.1);
+            text-shadow: 
+                0 0 8px rgba(57, 255, 20, 0.3),
+                0 0 15px rgba(57, 255, 20, 0.1);
             animation: pulse 5s infinite ease-in-out;
             line-height: 1;
         }
@@ -86,10 +89,9 @@
             font-size: clamp(1.2rem, 5vw, 2.2rem);
             color: white;
             opacity: 0.8;
-            z-index: 2; 
+            z-index: 5; 
             pointer-events: none;
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
-            white-space: nowrap;
         }
 
         .day-counter {
@@ -100,11 +102,10 @@
             font-size: clamp(1rem, 4vw, 1.8rem);
             color: white;
             opacity: 0.7;
-            z-index: 2;
+            z-index: 5;
             text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
         }
 
-        /* 轨道 */
         .orbit-container {
             position: absolute;
             top: 50%;
@@ -115,8 +116,8 @@
             z-index: 1;
         }
 
-        /* 旋转停止类 */
-        .paused-orbit {
+        /* 用于停止旋转的类 */
+        .paused {
             animation-play-state: paused !important;
         }
 
@@ -147,7 +148,7 @@
             z-index: 10;
             animation: reverse-rotate linear infinite;
             animation-duration: inherit;
-            -webkit-tap-highlight-color: transparent; /* 去除手机点击高亮 */
+            -webkit-tap-highlight-color: transparent; /* 去除移动端点击高亮 */
         }
 
         .shape-container {
@@ -159,11 +160,10 @@
             filter: drop-shadow(0 0 5px var(--star-glow));
             transition: transform 0.4s ease;
             opacity: 0.6;
-            pointer-events: none; /* 让点击穿透到 wrapper */
         }
 
-        /* 激活状态下的星星效果 */
-        .star-wrapper.is-active .shape-container {
+        /* 选中状态下的星星 */
+        .star-wrapper.active .shape-container {
             transform: scale(1.6) rotate(0deg) !important;
             filter: drop-shadow(0 0 15px white);
             opacity: 1;
@@ -172,12 +172,13 @@
         .preview-card {
             position: absolute;
             width: 0;
-            max-height: 80vh; /* 限制最大高度，防止手机端超出屏幕 */
+            height: auto;
+            max-height: 80vh; /* 限制最大高度，防止手机端溢出 */
             opacity: 0;
             border: 3px solid white;
             border-radius: 15px;
             overflow-x: hidden;
-            overflow-y: auto; /* 允许纵向滚动查看完整内容 */
+            overflow-y: auto; /* 内容过多时可滚动 */
             box-shadow: 0 10px 50px rgba(0, 0, 0, 0.9);
             transition: width 0.4s, opacity 0.4s, transform 0.4s;
             pointer-events: none;
@@ -189,22 +190,12 @@
             top: 50%;
             transform: translate(-50%, -50%) scale(0);
             transform-origin: center center;
-            scrollbar-width: thin; /* 适配火狐 */
-        }
-
-        /* 针对 Webkit 浏览器的滚动条美化 */
-        .preview-card::-webkit-scrollbar {
-            width: 4px;
-        }
-        .preview-card::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.3);
-            border-radius: 10px;
         }
 
         .preview-card img {
             width: 100%;
             height: auto;
-            max-height: 55vh; /* 调小移动端图片高度占比，给文字留空间 */
+            max-height: 50vh; /* 调小图片最大高度，给文字留空间 */
             display: block;
             background: #000;
             object-fit: contain;
@@ -219,15 +210,15 @@
             background: rgba(20, 20, 20, 0.9);
             word-break: break-word;
             border-top: 1px solid rgba(255,255,255,0.1);
-            min-height: 50px;
+            min-height: 40px;
         }
 
-        /* 激活状态下的卡片弹出 */
-        .star-wrapper.is-active .preview-card {
-            width: clamp(250px, 85vw, 320px); /* 针对手机端增加宽度占比 */
+        /* 展开状态 */
+        .star-wrapper.active .preview-card {
+            width: clamp(260px, 85vw, 320px);
             opacity: 1;
             transform: translate(-50%, -50%) scale(1);
-            pointer-events: auto; /* 弹出后允许交互（如滚动） */
+            pointer-events: auto;
         }
 
         .twinkle { animation: twinkle-glow 3s infinite alternate; }
@@ -235,9 +226,14 @@
             0% { opacity: 0.2; }
             100% { opacity: 0.6; }
         }
+
+        @media (max-width: 480px) {
+            .signature { bottom: 20px; }
+            .day-counter { bottom: 20px; }
+        }
     </style>
 </head>
-<body onclick="clearAllStars(event)">
+<body onclick="closeAllCards()">
 
     <div id="universe">
         <div class="greeting-container">
@@ -254,7 +250,6 @@
         const universe = document.getElementById('universe');
         const bgStarCount = 300;
 
-        // 这里保持你的图片和文字不变
         const imageUrls = [
             'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/rQ7e/1706X1279/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260214141319_282_173.jpg/webp',
             'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/laTb/1706X1279/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260214141607_283_173.jpg/webp',
@@ -262,14 +257,13 @@
             'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/MTKM/1280X960/2024-12-31.jpg/webp',
             'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/kJS0/1706X1279/2025-1-1.jpg/webp',
             'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/TstW/1280X960/2025-2-10.jpg/webp',
-            'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuv/20260214/7rSe/1444X960/2025-2-14.jpg/webp',
+            'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/7rSe/1444X960/2025-2-14.jpg/webp',
             'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/DUHn/1279X1705/2025-3-2.jpg/webp',
             'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/xYAp/1706X1279/2025-3-8.jpg/webp',
             'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/V81n/1706X1279/0329.jpg/webp',
             'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/Uy0o/1120X842/0412.jpg/webp',
             'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/dLLO/384X288/0501.jpg/webp',
             'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/Uo71/960X1282/0722.jpg/webp',
-            'https://test.fukit.cn/autoupload/fr/a9NsYDuUOYs6EhByidFECIFFEIG6Tuzx1HXvEPGNC4ayl5f0KlZfm6UsKj-HyTuv/20260214/D3oX/1706X1279/0914.jpg/webp',
             'https://pic8.fukit.cn/autoupload/ndnhpIjVhumHJooeV3L049iO_OyvX7mIgxFBfDMDErs/20260214/yQt3/1279X1706/1018.jpg/webp',
             'https://pic8.fukit.cn/autoupload/ndnhpIjVhumHJooeV3L049iO_OyvX7mIgxFBfDMDErs/20260214/23Aa/1706X1279/1127.jpg/webp',
             'https://pic8.fukit.cn/autoupload/ndnhpIjVhumHJooeV3L049iO_OyvX7mIgxFBfDMDErs/20260214/y57e/960X1282/1209.jpg/webp',
@@ -295,7 +289,6 @@
             "2025年4月12日，我愿变成童话里 你爱的那个天使~",
             "2025年5月1日，我们去拍了大头贴！好玩诶！",
             "2025年7月22日，我们去坐了苏州之眼",
-            "2025年9月14日，我们在滴水湖共度",
             "2025年10月18日，我们在佘山庆祝一周年纪念日",
             "2025年11月27日，我们在复旦看银杏",
             "2025年12月9日，我们一起去吃深夜食堂",
@@ -321,14 +314,10 @@
             document.getElementById('day-counter').innerText = `-- ${diffDays} Days`;
         }
 
-        // 点击背景清除所有开启的星星
-        function clearAllStars(e) {
-            if (e.target.id === 'universe' || e.target.tagName === 'BODY') {
-                const activeWrappers = document.querySelectorAll('.star-wrapper.is-active');
-                activeWrappers.forEach(w => w.classList.remove('is-active'));
-                const orbits = document.querySelectorAll('.orbit-container');
-                orbits.forEach(o => o.classList.remove('paused-orbit'));
-            }
+        // 统一关闭函数
+        function closeAllCards() {
+            document.querySelectorAll('.star-wrapper.active').forEach(w => w.classList.remove('active'));
+            document.querySelectorAll('.orbit-container').forEach(o => o.classList.remove('paused'));
         }
 
         function createOrbit(duration, reverse = false) {
@@ -354,7 +343,6 @@
 
             const orbitLayers = [createOrbit(60), createOrbit(90), createOrbit(120)];
 
-            // 背景星
             for (let i = 0; i < bgStarCount; i++) {
                 const star = document.createElement('div');
                 star.className = 'bg-star twinkle';
@@ -406,42 +394,27 @@
                 wrapper.appendChild(card);
                 specialOrbit.appendChild(wrapper);
 
-                // 交互逻辑：点击触发
+                // 点击交互逻辑
                 wrapper.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const isActive = wrapper.classList.contains('is-active');
+                    e.stopPropagation(); // 阻止冒泡到 body
+                    const wasActive = wrapper.classList.contains('active');
                     
-                    // 先清除所有
-                    document.querySelectorAll('.star-wrapper.is-active').forEach(w => w.classList.remove('is-active'));
-                    document.querySelectorAll('.orbit-container').forEach(o => o.classList.remove('paused-orbit'));
-                    
-                    if (!isActive) {
-                        wrapper.classList.add('is-active');
-                        specialOrbit.classList.add('paused-orbit'); // 暂停当前轨道
-                        
-                        // 边界检测逻辑优化
+                    closeAllCards(); // 先关闭其他的
+
+                    if (!wasActive) {
+                        wrapper.classList.add('active');
+                        specialOrbit.classList.add('paused'); // 暂停轨道
+
+                        // 动态计算弹出偏移，防止遮挡
                         const rect = wrapper.getBoundingClientRect();
                         const cardInner = wrapper.querySelector('.preview-card');
-                        
-                        let translateX = -50;
-                        let translateY = -50;
+                        let tx = -50, ty = -50;
+                        if (rect.top < 250) ty = -25;
+                        if (vh - rect.bottom < 250) ty = -75;
+                        if (rect.left < 150) tx = -30;
+                        if (vw - rect.right < 150) tx = -70;
 
-                        // 动态检测屏幕位置调整偏移百分比，确保内容不溢出
-                        const safetyMargin = 250; // 预留安全边距（约等于半个卡片高度）
-
-                        if (rect.top < safetyMargin) {
-                            translateY = -25; // 靠上则中心点下移
-                        } else if (vh - rect.bottom < safetyMargin) {
-                            translateY = -75; // 靠下则中心点上移
-                        }
-
-                        if (rect.left < 150) {
-                            translateX = -30; // 靠左则中心点右移
-                        } else if (vw - rect.right < 150) {
-                            translateX = -70; // 靠右则中心点左移
-                        }
-
-                        cardInner.style.transform = `translate(${translateX}%, ${translateY}%) scale(1)`;
+                        cardInner.style.transform = `translate(${tx}%, ${ty}%) scale(1)`;
                     }
                 });
             }
